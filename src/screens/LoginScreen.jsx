@@ -14,10 +14,13 @@ export const LoginScreen = ({ navigation }) => {
     }, []);
 
     const checkBiometrics = async () => {
-        const { available } = await BiometricService.checkBiometrics();
+        const { available, type } = await BiometricService.checkBiometrics();
         setIsBiometricAvailable(available);
         if (available) {
+            console.log('Biometry Type:', type); // Debug log
             handleBiometricLogin();
+        } else {
+            console.log('Biometrics not available');
         }
     };
 

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors } from '../theme/colors';
 import { StorageService } from '../services/StorageService';
 
-export const HomeScreen = ({ navigation }) => {
+ const HomeScreen = ({ navigation }) => {
     const handleLogout = () => {
         // In a real app, you might clear session state here
         navigation.reset({
@@ -78,3 +78,4 @@ const styles = StyleSheet.create({
         color: colors.primary,
     }
 });
+export default HomeScreen;  

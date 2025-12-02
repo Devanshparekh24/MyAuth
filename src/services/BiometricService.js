@@ -1,12 +1,27 @@
-import ReactNativeBiometrics from 'react-native-biometrics';
-
-const rnBiometrics = new ReactNativeBiometrics();
+import * as LocalAuthentication from 'expo-local-authentication';
 
 export const BiometricService = {
     async checkBiometrics() {
         try {
-            const { available, biometryType } = await rnBiometrics.isSensorAvailable();
-            return { available, type: biometryType };
+            const hasHardware = await LocalAuthentication.hasHardwareAsync();
+            const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+            if (!hasHardware || !isEnrolled) {
+                return { available: false, type: undefined };
+            }
+
+            const supportedTypes = await LocalAuthentication.supportedAuthenticationTypesAsync();
+
+            let type = 'Biometrics';
+            if (supportedTypes.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
+                type = 'FaceID';
+            } else if (supportedTypes.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
+                type = 'TouchID';
+            } else if (supportedTypes.includes(LocalAuthentication.AuthenticationType.IRIS)) {
+                type = 'Iris';
+            }
+
+            return { available: true, type };
         } catch (error) {
             console.error('Biometrics check failed', error);
             return { available: false };
@@ -15,11 +30,13 @@ export const BiometricService = {
 
     async authenticate(promptMessage = 'Confirm your identity') {
         try {
-            const { success } = await rnBiometrics.simplePrompt({
+            const result = await LocalAuthentication.authenticateAsync({
                 promptMessage,
-                cancelButtonText: 'Cancel',
+                fallbackLabel: 'Use MPIN',
+                disableDeviceFallback: true, // We handle fallback manually
+                cancelLabel: 'Cancel',
             });
-            return success;
+            return result.success;
         } catch (error) {
             console.error('Biometric authentication failed', error);
             return false;
