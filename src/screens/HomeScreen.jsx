@@ -8,7 +8,7 @@ import { StorageService } from '../services/StorageService';
         // In a real app, you might clear session state here
         navigation.reset({
             index: 0,
-            routes: [{ name: 'Login' }],
+            routes: [{ name: 'Auth' }],
         });
     };
 
