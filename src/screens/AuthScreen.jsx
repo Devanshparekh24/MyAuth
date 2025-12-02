@@ -8,8 +8,8 @@ const AuthScreen = ({ navigation }) => {
   const [biometricAvailable, setBiometricAvailable] = useState(false);
 
 
-  console.log('App is running Raj');
-
+  console.log('App is running');
+  
 
   useEffect(() => {
     rnBiometrics.isSensorAvailable()
@@ -17,8 +17,12 @@ const AuthScreen = ({ navigation }) => {
         if (available && biometryType) {
           setBiometricAvailable(true);
           handleBiometricAuth();
+          console.log('Biometric available');
+          
+          
         } else {
           setBiometricAvailable(false);
+          console.log('Biometric not available');
         }
       });
   }, []);
