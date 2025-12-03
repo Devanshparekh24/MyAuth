@@ -2,12 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, PermissionsAndroid } from 'react-native';
 import { colors } from '../theme/colors';
 import LocationButton from '../components/LocationButton';
-import MapView from 'react-native-maps';
+// import MapView from 'react-native-maps';
 
 const HomeScreen = ({ navigation }) => {
 
-    const [mLat, setMlat] = useState(0)
-    const [mLong, setMLong] = useState(0)
+
 
     const handleLogout = () => {
         // In a real app, you might clear session state here
@@ -51,19 +50,10 @@ const HomeScreen = ({ navigation }) => {
         <View>
 
 
-
-            <MapView
-                style={styles.map}
-                initialRegion={{
-                    latitude: 37.78825,
-                    longitude: -122.4324,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                }}
-            />
-
-
             <View style={styles.buttonContainer}>
+
+
+
 
                 <LocationButton />
 
@@ -83,7 +73,8 @@ const HomeScreen = ({ navigation }) => {
 
 export const styles = StyleSheet.create({
     map: {
-        flex: 1 /6
+        width: '100%',
+        height: '65%',
     },
     container: {
         flex: 1,
