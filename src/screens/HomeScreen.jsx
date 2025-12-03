@@ -3,7 +3,14 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors } from '../theme/colors';
 import { StorageService } from '../services/StorageService';
 
- const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation }) => {
+    const [region, setRegion] = useState({
+        latitude: 37.78825,
+        longitude: -122.4324,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421, 
+    });
+    
     const handleLogout = () => {
         // In a real app, you might clear session state here
         navigation.reset({
