@@ -1,16 +1,14 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, PermissionsAndroid } from 'react-native';
 import { colors } from '../theme/colors';
-import { StorageService } from '../services/StorageService';
+import LocationButton from '../components/LocationButton';
+import MapView from 'react-native-maps';
 
 const HomeScreen = ({ navigation }) => {
-    const [region, setRegion] = useState({
-        latitude: 37.78825,
-        longitude: -122.4324,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421, 
-    });
-    
+
+    const [mLat, setMlat] = useState(0)
+    const [mLong, setMLong] = useState(0)
+
     const handleLogout = () => {
         // In a real app, you might clear session state here
         navigation.reset({
@@ -19,31 +17,74 @@ const HomeScreen = ({ navigation }) => {
         });
     };
 
-    const handleResetMpin = async () => {
-        await StorageService.clearMpin();
-        navigation.reset({
-            index: 0,
-            routes: [{ name: 'MpinSetup' }],
-        });
-    }
+    const requestLocationPermission = async () => {
+        try {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                {
+                    title: 'Location Permission',
+                    message:
+                        'MyAuth needs access to your location ',
+                    buttonNeutral: 'Ask Me Later',
+                    buttonNegative: 'Cancel',
+                    buttonPositive: 'OK',
+                },
+            );
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                console.log('You can use the Location');
+            } else {
+                console.log('Location permission denied');
+            }
+        } catch (err) {
+            console.warn(err);
+        }
+    };
+
+
+    useEffect(() => {
+        requestLocationPermission();
+    }, []);
+
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Welcome Home!</Text>
-            <Text style={styles.subtitle}>You are securely authenticated.</Text>
 
-            <TouchableOpacity style={styles.button} onPress={handleLogout}>
-                <Text style={styles.buttonText}>Logout</Text>
-            </TouchableOpacity>
+        <View>
 
-            <TouchableOpacity style={[styles.button, styles.secondaryButton]} onPress={handleResetMpin}>
-                <Text style={[styles.buttonText, styles.secondaryButtonText]}>Reset MPIN</Text>
-            </TouchableOpacity>
+
+
+            <MapView
+                style={styles.map}
+                initialRegion={{
+                    latitude: 37.78825,
+                    longitude: -122.4324,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                }}
+            />
+
+
+            <View style={styles.buttonContainer}>
+
+                <LocationButton />
+
+                <TouchableOpacity style={styles.button} onPress={handleLogout}>
+                    <Text style={styles.buttonText}>Logout</Text>
+                </TouchableOpacity>
+            </View>
+
+
+
+
+
+
         </View>
     );
 };
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
+    map: {
+        flex: 1 /6
+    },
     container: {
         flex: 1,
         justifyContent: 'center',
@@ -70,6 +111,8 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'center',
         marginBottom: 10,
+        // flexDirection: 'column',
+        justifyContent: 'flex-end',
     },
     buttonText: {
         color: colors.surface,
@@ -83,6 +126,13 @@ const styles = StyleSheet.create({
     },
     secondaryButtonText: {
         color: colors.primary,
+    },
+    buttonContainer: {
+        justifyContent: "flex-end",
+        alignItems: "center",
+        paddingVertical: 20
     }
+
+
 });
 export default HomeScreen;  

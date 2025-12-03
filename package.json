@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "start": "react-native start",
     "dev": "react-native start",
+    "log": "adb logcat -s ReactNativeJS ReactNative:V",
     "test": "jest"
   },
   "dependencies": {
@@ -21,6 +22,7 @@
     "react-native-biometrics": "^3.0.1",
     "react-native-geolocation-service": "^5.3.1",
     "react-native-keychain": "^10.0.0",
+    "react-native-maps": "^1.26.19",
     "react-native-permissions": "^5.4.4",
     "react-native-safe-area-context": "^5.5.2",
     "react-native-screens": "^4.18.0"
