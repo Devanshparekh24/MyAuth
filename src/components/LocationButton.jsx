@@ -56,12 +56,14 @@ function LocationButton() {
             console.log('Calling Geolocation.getCurrentPosition');
 
             Geolocation.getCurrentPosition(
+
                 (position) => {
+                    console.log(position, 'position');
                     console.log('SUCCESS! Got position:', JSON.stringify(position));
-                    const { latitude, longitude } = position.coords;
-                    setLocation({ latitude, longitude });
+                    const { latitude, longitude, accuracy, speed } = position.coords;
+                    setLocation({ latitude, longitude, accuracy, speed });
                     setLoading(false);
-                    console.log('Latitude:', latitude, 'Longitude:', longitude);
+                    console.log('Latitude:', latitude, 'Longitude:', longitude, 'Accuracy:', accuracy, 'Speed:', speed);
                 },
                 (err) => {
                     console.error('Geolocation ERROR:', err.code, err.message);
@@ -72,8 +74,8 @@ function LocationButton() {
                         Geolocation.getCurrentPosition(
                             (position) => {
                                 console.log('SUCCESS with cached! Got position:', JSON.stringify(position));
-                                const { latitude, longitude } = position.coords;
-                                setLocation({ latitude, longitude });
+                                const { latitude, longitude, accuracy, speed } = position.coords;
+                                setLocation({ latitude, longitude, accuracy, speed });
                                 setLoading(false);
                             },
                             (retryErr) => {
@@ -126,6 +128,12 @@ function LocationButton() {
                     </Text>
                     <Text style={localStyles.locationText}>
                         Longitude: {location.longitude.toFixed(6)}
+                    </Text>
+                    <Text style={localStyles.locationText}>
+                        Accuracy: {location.accuracy.toFixed(6)}
+                    </Text>
+                    <Text style={localStyles.locationText}>
+                        Speed: {location.speed.toFixed(6)}
                     </Text>
                 </View>
             )}

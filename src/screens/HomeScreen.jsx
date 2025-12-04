@@ -6,8 +6,6 @@ import LocationButton from '../components/LocationButton';
 
 const HomeScreen = ({ navigation }) => {
 
-
-
     const handleLogout = () => {
         // In a real app, you might clear session state here
         navigation.reset({
@@ -44,29 +42,15 @@ const HomeScreen = ({ navigation }) => {
         requestLocationPermission();
     }, []);
 
-
     return (
 
         <View>
-
-
             <View style={styles.buttonContainer}>
-
-
-
-
-                <LocationButton />
-
+               <LocationButton />
                 <TouchableOpacity style={styles.button} onPress={handleLogout}>
                     <Text style={styles.buttonText}>Logout</Text>
                 </TouchableOpacity>
             </View>
-
-
-
-
-
-
         </View>
     );
 };

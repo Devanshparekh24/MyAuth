@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Button, Alert, StyleSheet, Text } from 'react-native';
 import ReactNativeBiometrics from 'react-native-biometrics';
+import { BackHandler } from 'react-native';
 
 const rnBiometrics = new ReactNativeBiometrics();
 
@@ -28,13 +29,14 @@ const AuthScreen = ({ navigation }) => {
   }, []);
 
   const handleBiometricAuth = () => {
-    rnBiometrics.simplePrompt({ promptMessage: 'Authenticate to open app' })
+    rnBiometrics.simplePrompt({ promptMessage: 'Use Finger to open app' })
       .then(result => {
         if (result.success) {
           // Biometric authentication successful
           navigation.replace('Home'); // Navigate to main app
         } else {
-          Alert.alert('Authentication Cancelled', 'Please login with MPIN');
+          // Alert.alert('Authentication Cancelled', 'Please login with MPIN');
+          BackHandler.exitApp();
         }
       });
   };
@@ -46,12 +48,21 @@ const AuthScreen = ({ navigation }) => {
   };
 
   return (
+
+
+
+  
     <View style={styles.container}>
       {!biometricAvailable && (
         <>
-          <Text style={styles.text}>Biometric not available. Use MPIN to login.</Text>
+          <Text style={styles.text}>Biometric not available.</Text>
           <Button title="Login with MPIN" onPress={handleMPINAuth} />
         </>
+      )}
+
+
+      {biometricAvailable && (
+        <Button title="Login with Biometric" onPress={handleBiometricAuth} />
       )}
     </View>
   );
