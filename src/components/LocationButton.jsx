@@ -55,49 +55,87 @@ function LocationButton() {
 
             console.log('Calling Geolocation.getCurrentPosition');
 
-            Geolocation.getCurrentPosition(
+            // Geolocation.getCurrentPosition(
 
+            //     (position) => {
+            //         console.log(position, 'position');
+            //         console.log('SUCCESS! Got position:', JSON.stringify(position));
+            //         const { latitude, longitude, accuracy, speed } = position.coords;
+            //         setLocation({ latitude, longitude, accuracy, speed });
+            //         setLoading(false);
+            //         console.log('Latitude:', latitude, 'Longitude:', longitude, 'Accuracy:', accuracy, 'Speed:', speed);
+            //     },
+            //     (err) => {
+            //         console.error('Geolocation ERROR:', err.code, err.message);
+
+            //         // If timeout (error code 3), try again with cached location
+            //         if (err.code === 3) {
+            //             console.log('Timeout - trying with cached location');
+            //             Geolocation.getCurrentPosition(
+            //                 (position) => {
+            //                     console.log('SUCCESS with cached! Got position:', JSON.stringify(position));
+            //                     const { latitude, longitude, accuracy, speed } = position.coords;
+            //                     setLocation({ latitude, longitude, accuracy, speed });
+            //                     setLoading(false);
+            //                 },
+            //                 (retryErr) => {
+            //                     console.error('Retry failed:', retryErr.code, retryErr.message);
+            //                     setError(`Unable to get location. Please ensure GPS is enabled and try again.`);
+            //                     setLoading(false);
+            //                 },
+            //                 {
+            //                     enableHighAccuracy: false,
+            //                     timeout: 10000,
+            //                     maximumAge: 300000 // Accept location up to 5 minutes old
+            //                 }
+            //             );
+            //         } else {
+            //             setError(`Error ${err.code}: ${err.message}`);
+            //             setLoading(false);
+            //         }
+            //     },
+            //     {
+            //         enableHighAccuracy: false, // Faster, uses network location
+            //         timeout: 30000, // 30 seconds
+            //         maximumAge: 10000 // Accept location up to 10 seconds old
+            //     }
+            // );
+            Geolocation.getCurrentPosition(
                 (position) => {
-                    console.log(position, 'position');
-                    console.log('SUCCESS! Got position:', JSON.stringify(position));
+                    console.log("FAST position:", position);
                     const { latitude, longitude, accuracy, speed } = position.coords;
                     setLocation({ latitude, longitude, accuracy, speed });
                     setLoading(false);
-                    console.log('Latitude:', latitude, 'Longitude:', longitude, 'Accuracy:', accuracy, 'Speed:', speed);
                 },
                 (err) => {
-                    console.error('Geolocation ERROR:', err.code, err.message);
+                    console.log("ERROR:", err);
 
-                    // If timeout (error code 3), try again with cached location
-                    if (err.code === 3) {
-                        console.log('Timeout - trying with cached location');
-                        Geolocation.getCurrentPosition(
-                            (position) => {
-                                console.log('SUCCESS with cached! Got position:', JSON.stringify(position));
-                                const { latitude, longitude, accuracy, speed } = position.coords;
-                                setLocation({ latitude, longitude, accuracy, speed });
-                                setLoading(false);
-                            },
-                            (retryErr) => {
-                                console.error('Retry failed:', retryErr.code, retryErr.message);
-                                setError(`Unable to get location. Please ensure GPS is enabled and try again.`);
-                                setLoading(false);
-                            },
-                            {
-                                enableHighAccuracy: false,
-                                timeout: 10000,
-                                maximumAge: 300000 // Accept location up to 5 minutes old
-                            }
-                        );
-                    } else {
-                        setError(`Error ${err.code}: ${err.message}`);
-                        setLoading(false);
-                    }
+                    // Retry with HIGH ACCURACY only if first attempt fails
+                    Geolocation.getCurrentPosition(
+                        (position) => {
+                            console.log("HIGH ACCURACY position:", position);
+                            const { latitude, longitude, accuracy, speed } = position.coords;
+                            setLocation({ latitude, longitude, accuracy, speed });
+                            setLoading(false);
+                        },
+                        (retryErr) => {
+                            console.log("Retry failed:", retryErr);
+                            setError("Unable to get location. Ensure GPS is ON and try again.");
+                            setLoading(false);
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 8000,
+                            maximumAge: 0,
+                            forceRequestLocation: true,
+                            showLocationDialog: true,
+                        }
+                    );
                 },
                 {
-                    enableHighAccuracy: false, // Faster, uses network location
-                    timeout: 30000, // 30 seconds
-                    maximumAge: 10000 // Accept location up to 10 seconds old
+                    enableHighAccuracy: false,   // FASTEST
+                    timeout: 4000,               // Don't wait too long
+                    maximumAge: 60000,           // Accept cached location up to 1 minute
                 }
             );
 
