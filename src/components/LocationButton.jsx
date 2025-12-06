@@ -2,11 +2,13 @@ import { View, Text, TouchableOpacity, PermissionsAndroid, Platform, StyleSheet 
 import React, { useState } from 'react'
 import { styles } from '../screens/HomeScreen'
 import Geolocation from '@react-native-community/geolocation';
+import Geocoder from 'react-native-geocoder-reborn';
 
 function LocationButton() {
     const [location, setLocation] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [address, setAddress] = useState(null);
 
     const requestLocationPermission = async () => {
         if (Platform.OS === 'android') {
@@ -105,6 +107,7 @@ function LocationButton() {
                     console.log("FAST position:", position);
                     const { latitude, longitude, accuracy, speed } = position.coords;
                     setLocation({ latitude, longitude, accuracy, speed });
+                    getAddressFromCoords(latitude, longitude);
                     setLoading(false);
                 },
                 (err) => {
@@ -116,6 +119,7 @@ function LocationButton() {
                             console.log("HIGH ACCURACY position:", position);
                             const { latitude, longitude, accuracy, speed } = position.coords;
                             setLocation({ latitude, longitude, accuracy, speed });
+                            getAddressFromCoords(latitude, longitude);
                             setLoading(false);
                         },
                         (retryErr) => {
@@ -146,6 +150,46 @@ function LocationButton() {
         }
     };
 
+    // Native Reverse Geocoding using react-native-geocoder-reborn (like Android's Geocoder class)
+    const getAddressFromCoords = async (lat, lon) => {
+        console.log("Calling Native Geocoder with:", lat, lon);
+        try {
+            const results = await Geocoder.geocodePosition({ lat, lng: lon });
+            console.log("Geocoder Response:", JSON.stringify(results));
+
+            if (results && results.length > 0) {
+                const addr = results[0];
+
+                // Build exact location string
+                let exactLocation = "";
+                if (addr.streetNumber) exactLocation += addr.streetNumber + ", ";
+                if (addr.streetName) exactLocation += addr.streetName;
+                if (!exactLocation && addr.subLocality) exactLocation = addr.subLocality;
+
+                const addressInfo = {
+                    exactLocation: exactLocation || "",
+                    street: addr.streetName || "",
+                    area: addr.subLocality || addr.subAdminArea || "",
+                    city: addr.locality || addr.subAdminArea || "",
+                    district: addr.subAdminArea || "",
+                    state: addr.adminArea || "",
+                    country: addr.country || "",
+                    pincode: addr.postalCode || "",
+                    fullAddress: addr.formattedAddress || ""
+                };
+
+                console.log("Setting Address:", addressInfo);
+                setAddress(addressInfo);
+            } else {
+                console.log("No address data found");
+                setAddress(null);
+            }
+        } catch (err) {
+            console.log("Reverse Geocoding Error:", err);
+            setAddress(null);
+        }
+    };
+
     return (
         <View style={localStyles.container}>
             <TouchableOpacity
@@ -173,6 +217,20 @@ function LocationButton() {
                     <Text style={localStyles.locationText}>
                         Speed: {location.speed.toFixed(6)}
                     </Text>
+                </View>
+            )}
+
+            {address && (
+                <View style={localStyles.addressContainer}>
+                    <Text style={localStyles.locationTitle}>🏠 Address Details:</Text>
+                    {address.exactLocation ? <Text style={localStyles.locationText}>📍 Exact Location: {address.exactLocation}</Text> : null}
+                    {address.area ? <Text style={localStyles.locationText}>🏘️ Area: {address.area}</Text> : null}
+                    {address.city ? <Text style={localStyles.locationText}>🌆 City: {address.city}</Text> : null}
+                    {address.district ? <Text style={localStyles.locationText}>📍 District: {address.district}</Text> : null}
+                    {address.state ? <Text style={localStyles.locationText}>🗺️ State: {address.state}</Text> : null}
+                    {address.country ? <Text style={localStyles.locationText}>🌍 Country: {address.country}</Text> : null}
+                    {address.pincode ? <Text style={localStyles.locationText}>📮 Pincode: {address.pincode}</Text> : null}
+                    {address.fullAddress ? <Text style={localStyles.fullAddressText}>📌 Full Address: {address.fullAddress}</Text> : null}
                 </View>
             )}
 
@@ -211,6 +269,14 @@ const localStyles = StyleSheet.create({
         fontWeight: '500',
         marginVertical: 2,
     },
+    addressContainer: {
+        marginTop: 15,
+        padding: 15,
+        backgroundColor: '#e3f2fd',
+        borderRadius: 8,
+        borderLeftWidth: 4,
+        borderLeftColor: '#2196f3',
+    },
     errorContainer: {
         marginTop: 15,
         padding: 15,
@@ -224,6 +290,19 @@ const localStyles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '500',
     },
+    fullAddressText: {
+        color: '#1565c0',
+        fontSize: 13,
+        fontWeight: '400',
+        marginTop: 8,
+        fontStyle: 'italic',
+        lineHeight: 18,
+    },
 });
 
 export default LocationButton;
+
+
+
+
+
