@@ -4,7 +4,7 @@ import { styles } from '../screens/HomeScreen'
 import Geolocation from '@react-native-community/geolocation';
 import Geocoder from 'react-native-geocoder-reborn';
 
-function LocationButton() {
+function LocationButton({ onLocationChange }) {
     const [location, setLocation] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -17,7 +17,7 @@ function LocationButton() {
                     PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
                     {
                         title: 'Location Permission',
-                        message: 'MyAuth needs access to your location',
+                        message: 'Attendence App needs access to your location',
                         buttonNeutral: 'Ask Me Later',
                         buttonNegative: 'Cancel',
                         buttonPositive: 'OK',
@@ -106,7 +106,11 @@ function LocationButton() {
                 (position) => {
                     console.log("FAST position:", position);
                     const { latitude, longitude, accuracy, speed } = position.coords;
-                    setLocation({ latitude, longitude, accuracy, speed });
+                    const locationData = { latitude, longitude, accuracy, speed };
+                    setLocation(locationData);
+                    if (onLocationChange) {
+                        onLocationChange(locationData);
+                    }
                     getAddressFromCoords(latitude, longitude);
                     setLoading(false);
                 },
@@ -118,7 +122,11 @@ function LocationButton() {
                         (position) => {
                             console.log("HIGH ACCURACY position:", position);
                             const { latitude, longitude, accuracy, speed } = position.coords;
-                            setLocation({ latitude, longitude, accuracy, speed });
+                            const locationData = { latitude, longitude, accuracy, speed };
+                            setLocation(locationData);
+                            if (onLocationChange) {
+                                onLocationChange(locationData);
+                            }
                             getAddressFromCoords(latitude, longitude);
                             setLoading(false);
                         },
